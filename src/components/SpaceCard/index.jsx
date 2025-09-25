@@ -9,8 +9,15 @@ const SpaceCard = ({ space }) => {
   return (
     <div className="col-md-6 col-lg-4 mb-4">
       <div className="card space-card h-100">
-        <img src={main_image} className="card-img-top" alt={name} 
-             style={{height: '200px', objectFit: 'cover'}} />
+        <img 
+          src={main_image} 
+          className="card-img-top" 
+          alt={name}
+          style={{height: '200px', objectFit: 'cover'}}
+          onError={(e) => {
+            e.target.src = `https://via.placeholder.com/400x200/007bff/ffffff?text=${encodeURIComponent(name)}`;
+          }}
+        />
         <div className="card-body d-flex flex-column">
           <h5 className="card-title">{name}</h5>
           <p className="card-text text-muted">
@@ -35,7 +42,11 @@ const SpaceCard = ({ space }) => {
                 <FaClock className="me-1" />{hours}
               </small>
             </div>
-            <Link to={`/space/${id}`} className="btn btn-primary w-100">
+            <Link 
+              to={`/space/${id}`} 
+              className="btn btn-primary w-100"
+              state={{ from: 'homepage' }} // Add state to help with navigation
+            >
               View Details & Book
             </Link>
           </div>

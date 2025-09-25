@@ -7,9 +7,12 @@ import './SpaceDetail.css';
 
 const SpaceDetail = () => {
   const { spaceId } = useParams();
+  
+  // Ensure spaceId is properly parsed as integer
   const space = spacesData.find(s => s.id === parseInt(spaceId));
 
   if (!space) {
+    console.log('Space not found for ID:', spaceId);
     return <Navigate to="/" replace />;
   }
 
@@ -19,8 +22,19 @@ const SpaceDetail = () => {
         <div className="row">
           <div className="col-lg-8">
             <div className="card mb-4">
-              <img src={space.main_image} alt={space.name} 
-                   className="card-img-top" style={{height: '400px', objectFit: 'cover'}} />
+              <img 
+                src={space.main_image} 
+                alt={space.name} 
+                className="card-img-top" 
+                style={{
+                  height: '400px', 
+                  objectFit: 'cover',
+                  backgroundColor: '#f8f9fa' // Fallback background
+                }}
+                onError={(e) => {
+                  e.target.src = `https://via.placeholder.com/800x400/007bff/ffffff?text=${encodeURIComponent(space.name)}`;
+                }}
+              />
             </div>
             
             <div className="card mb-4">
@@ -74,7 +88,7 @@ const SpaceDetail = () => {
             {space.time_slots && space.time_slots.length > 0 && (
               <div className="card">
                 <div className="card-body">
-                  <h4>Available Time Slots</h4>
+                  <h4>Recommended Time Slots</h4>
                   <div className="d-flex flex-wrap gap-2">
                     {space.time_slots.map((slot, index) => (
                       <span key={index} className="badge bg-primary p-2">

@@ -14,10 +14,14 @@ export const bookingSchema = yup.object({
   endTime: yup.string().required('End time is required'),
   guests: yup
     .number()
+    .typeError('Number of guests must be a whole number')
     .required('Number of guests is required')
     .min(1, 'At least 1 guest required')
     .max(10, 'Maximum 10 guests allowed')
     .integer('Must be a whole number')
+    .test('no-decimal', 'Decimal numbers are not allowed', value => {
+      return value === undefined || value === null || Number.isInteger(value);
+    })
 });
 
 // Add time validation function
