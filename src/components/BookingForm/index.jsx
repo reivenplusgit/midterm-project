@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '../../contexts/AuthContext';
 import { useBooking } from '../../contexts/BookingContext';
 import { useNavigate } from 'react-router-dom';
 import { bookingSchema, validateTimes } from '../../utils/validationSchemas';
-import { FaCalendar, FaClock, FaUsers, FaCheck } from 'react-icons/fa';
+import { FaCalendar, FaClock, FaUsers, FaCheck, FaBolt } from 'react-icons/fa';
 import './BookingForm.css';
 
 const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
   const { user, isAuthenticated } = useAuth();
   const { addBooking } = useBooking();
   const navigate = useNavigate();
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
 
-  const { register, handleSubmit, formState: { errors }, watch, setError, setValue } = useForm({
+  const { register, handleSubmit, formState: { errors }, watch, setValue, setError, clearErrors } = useForm({
     resolver: yupResolver(bookingSchema),
     defaultValues: {
       guests: 1,
@@ -25,63 +26,63 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
   const watchStartTime = watch('startTime');
   const watchEndTime = watch('endTime');
   const watchGuests = watch('guests');
+  const watchBookingDate = watch('bookingDate');
 
-  // Parse time slot and set form values
-  const handleTimeSlotClick = (slot) => {
-    // Handle different time slot formats
-    let startTime, endTime;
-    
-    if (slot.includes(' - ')) {
-      // Format: "09:00 - 11:00"
-      [startTime, endTime] = slot.split(' - ');
-    } else if (slot.includes('-')) {
-      // Format: "09:00-11:00"
-      [startTime, endTime] = slot.split('-');
-    } else if (slot.includes(' to ')) {
-      // Format: "9:00 AM to 11:00 AM"
-      const [start, end] = slot.split(' to ');
-      startTime = convertTo24Hour(start.trim());
-      endTime = convertTo24Hour(end.trim());
-    } else {
-      // Single time format, assume 1 hour duration
-      startTime = slot.trim();
-      const startHour = parseInt(startTime.split(':')[0]);
-      endTime = `${(startHour + 1).toString().padStart(2, '0')}:${startTime.split(':')[1]}`;
+  // Parse time slot function
+  const parseTimeSlot = (slot) => {
+    if (slot.includes('Full Day Pass')) {
+      return { startTime: '09:00', endTime: '17:00' };
+    }
+    if (slot.includes('Night Owl Pass')) {
+      return { startTime: '21:00', endTime: '06:00' };
     }
     
-    // Clean up times and ensure proper format
-    startTime = formatTime(startTime);
-    endTime = formatTime(endTime);
+    // Parse formats like "9am - 1pm", "1pm - 5pm", etc.
+    const timeMatch = slot.match(/(\d+)(am|pm)\s*-\s*(\d+)(am|pm)/i);
+    if (timeMatch) {
+      const startHour = parseInt(timeMatch[1]);
+      const startPeriod = timeMatch[2].toLowerCase();
+      const endHour = parseInt(timeMatch[3]);
+      const endPeriod = timeMatch[4].toLowerCase();
+      
+      const formatTime = (hour, period) => {
+        let militaryHour = hour;
+        if (period === 'pm' && hour !== 12) militaryHour += 12;
+        if (period === 'am' && hour === 12) militaryHour = 0;
+        return militaryHour.toString().padStart(2, '0') + ':00';
+      };
+      
+      return {
+        startTime: formatTime(startHour, startPeriod),
+        endTime: formatTime(endHour, endPeriod)
+      };
+    }
     
-    setValue('startTime', startTime);
-    setValue('endTime', endTime);
+    // Parse session formats
+    if (slot.includes('Morning Session')) {
+      return { startTime: '10:00', endTime: '14:00' };
+    }
+    if (slot.includes('Afternoon Session')) {
+      return { startTime: '14:00', endTime: '18:00' };
+    }
+    if (slot.includes('Evening')) {
+      return { startTime: '18:00', endTime: '22:00' };
+    }
+    if (slot.includes('Early Bird')) {
+      return { startTime: '06:00', endTime: '12:00' };
+    }
+    
+    return { startTime: '09:00', endTime: '10:00' };
   };
 
-  // Convert 12-hour format to 24-hour format
-  const convertTo24Hour = (time12h) => {
-    const [time, modifier] = time12h.split(' ');
-    let [hours, minutes] = time.split(':');
-    
-    if (hours === '12') {
-      hours = '00';
-    }
-    
-    if (modifier === 'PM' && hours !== '00') {
-      hours = parseInt(hours, 10) + 12;
-    }
-    
-    return `${hours.toString().padStart(2, '0')}:${minutes || '00'}`;
-  };
-
-  // Ensure time is in HH:MM format
-  const formatTime = (time) => {
-    const cleaned = time.replace(/\s/g, '');
-    if (cleaned.includes(':')) {
-      const [hours, minutes] = cleaned.split(':');
-      return `${hours.padStart(2, '0')}:${(minutes || '00').padStart(2, '0')}`;
-    }
-    // If just hours provided
-    return `${cleaned.padStart(2, '0')}:00`;
+  // Handle time slot selection
+  const handleTimeSlotSelect = (slot) => {
+    setSelectedTimeSlot(slot);
+    const times = parseTimeSlot(slot);
+    setValue('startTime', times.startTime);
+    setValue('endTime', times.endTime);
+    clearErrors('startTime');
+    clearErrors('endTime');
   };
 
   // Calculate total price
@@ -89,7 +90,13 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
     if (watchStartTime && watchEndTime) {
       const start = parseInt(watchStartTime.split(':')[0]);
       const end = parseInt(watchEndTime.split(':')[0]);
-      const hours = Math.max(end - start, 1); // Ensure at least 1 hour
+      let hours = end - start;
+      
+      // Handle overnight bookings
+      if (hours < 0) hours += 24;
+      
+      // Ensure minimum 1 hour
+      hours = Math.max(hours, 1);
       return hours * price * (watchGuests || 1);
     }
     return price; // Default to 1 hour, 1 guest
@@ -120,6 +127,7 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
       endTime: data.endTime,
       guests: parseInt(data.guests),
       totalPrice: calculateTotal(),
+      timeSlot: selectedTimeSlot,
       status: 'confirmed'
     };
 
@@ -152,13 +160,37 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
         </div>
         <div className="card-body">
           <form onSubmit={handleSubmit(onSubmit)}>
+            {/* Quick Time Slots */}
+            {timeSlots && timeSlots.length > 0 && (
+              <div className="mb-4">
+                <label className="form-label fw-bold">
+                  <FaBolt className="me-2 text-warning" /> Quick Select Time Slots
+                </label>
+                <div className="d-flex flex-wrap gap-2">
+                  {timeSlots.map((slot, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      className={`btn btn-sm ${
+                        selectedTimeSlot === slot ? 'btn-success' : 'btn-outline-primary'
+                      }`}
+                      onClick={() => handleTimeSlotSelect(slot)}
+                    >
+                      {slot}
+                    </button>
+                  ))}
+                </div>
+                <small className="text-muted">Click a time slot to auto-fill the time fields</small>
+              </div>
+            )}
+
             <div className="mb-3">
               <label className="form-label">
                 <FaCalendar className="me-2" /> Booking Date
               </label>
               <input
                 type="date"
-                className={`form-control ${errors.bookingDate ? 'is-invalid' : ''}`}
+                className={`form-control booking-input ${errors.bookingDate ? 'is-invalid' : ''}`}
                 {...register('bookingDate')}
                 min={new Date().toISOString().split('T')[0]}
               />
@@ -167,29 +199,6 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
               )}
             </div>
             
-            {/* Predefined Time Slots */}
-            {timeSlots && timeSlots.length > 0 && (
-              <div className="mb-3">
-                <label className="form-label">
-                  <FaClock className="me-2" /> Quick Select Time Slots
-                </label>
-                <div className="d-flex flex-wrap gap-2">
-                  {timeSlots.map((slot, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      className="btn btn-outline-primary btn-sm"
-                      onClick={() => handleTimeSlotClick(slot)}
-                      title={`Click to select ${slot}`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
-                </div>
-                <small className="text-muted">Click a time slot to automatically fill start and end times</small>
-              </div>
-            )}
-            
             <div className="row mb-3">
               <div className="col-md-6">
                 <label className="form-label">
@@ -197,8 +206,12 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
                 </label>
                 <input
                   type="time"
-                  className={`form-control ${errors.startTime ? 'is-invalid' : ''}`}
+                  className={`form-control booking-input ${errors.startTime ? 'is-invalid' : ''}`}
                   {...register('startTime')}
+                  onChange={(e) => {
+                    setSelectedTimeSlot(null); // Clear quick selection when manually editing
+                    register('startTime').onChange(e);
+                  }}
                 />
                 {errors.startTime && (
                   <div className="invalid-feedback">{errors.startTime.message}</div>
@@ -210,8 +223,12 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
                 </label>
                 <input
                   type="time"
-                  className={`form-control ${errors.endTime ? 'is-invalid' : ''}`}
+                  className={`form-control booking-input ${errors.endTime ? 'is-invalid' : ''}`}
                   {...register('endTime')}
+                  onChange={(e) => {
+                    setSelectedTimeSlot(null); // Clear quick selection when manually editing
+                    register('endTime').onChange(e);
+                  }}
                 />
                 {errors.endTime && (
                   <div className="invalid-feedback">
@@ -237,15 +254,39 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
               )}
             </div>
             
+            {/* Price Summary */}
             <div className="price-summary mb-3 p-3 bg-light rounded">
-              <h6>Price Summary</h6>
-              <div className="d-flex justify-content-between">
-                <span>₱{price} × {watchGuests || 1} guests</span>
-                <span>₱{calculateTotal()}</span>
+              <h6 className="fw-bold">Price Summary</h6>
+              <div className="d-flex justify-content-between mb-1">
+                <span>Hourly Rate:</span>
+                <span>₱{price}</span>
+              </div>
+              <div className="d-flex justify-content-between mb-1">
+                <span>Guests:</span>
+                <span>{watchGuests || 1}</span>
+              </div>
+              <div className="d-flex justify-content-between mb-1">
+                <span>Duration:</span>
+                <span>
+                  {watchStartTime && watchEndTime ? (
+                    (() => {
+                      const start = parseInt(watchStartTime.split(':')[0]);
+                      const end = parseInt(watchEndTime.split(':')[0]);
+                      let hours = end - start;
+                      if (hours < 0) hours += 24;
+                      return Math.max(hours, 1) + ' hours';
+                    })()
+                  ) : '1 hour'}
+                </span>
+              </div>
+              <hr />
+              <div className="d-flex justify-content-between fw-bold">
+                <span>Total:</span>
+                <span className="text-success">₱{calculateTotal()}</span>
               </div>
             </div>
             
-            <button type="submit" className="btn btn-success w-100">
+            <button type="submit" className="btn btn-success w-100 py-2">
               <FaCheck className="me-2" /> Confirm Booking
             </button>
           </form>

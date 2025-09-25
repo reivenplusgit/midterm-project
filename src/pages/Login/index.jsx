@@ -16,7 +16,8 @@ const Login = () => {
     resolver: yupResolver(loginSchema)
   });
 
-  const from = location.state?.from?.pathname || '/dashboard/my-bookings';
+  // Always redirect to home after login instead of dashboard
+  const from = location.state?.from?.pathname || '/';
 
   const onSubmit = (data) => {
     const userData = {
