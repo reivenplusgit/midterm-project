@@ -5,12 +5,12 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useBooking } from '../../contexts/BookingContext';
 import { useNavigate } from 'react-router-dom';
 import { bookingSchema, validateTimes } from '../../utils/validationSchemas';
-import { FaCalendar, FaClock, FaUsers, FaCheck, FaBolt } from 'react-icons/fa';
+import { FaCalendar, FaClock, FaUsers, FaCheck, FaBolt, FaExclamationTriangle } from 'react-icons/fa';
 import './BookingForm.css';
 
-const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
+const BookingForm = ({ spaceId, spaceName, price, timeSlots, operatingHours }) => {
   const { user, isAuthenticated } = useAuth();
-  const { addBooking } = useBooking();
+  const { addBooking, isBookingConflict, hasUserBookedSameSlot } = useBooking();
   const navigate = useNavigate();
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
 
@@ -28,16 +28,51 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
   const watchGuests = watch('guests');
   const watchBookingDate = watch('bookingDate');
 
+  // Parse operating hours
+  const parseOperatingHours = (hours) => {
+    if (hours === 'Open 24/7' || hours === '24/7') {
+      return { start: '00:00', end: '23:59' };
+    }
+    
+    const match = hours.match(/(\d+):?(\d*)\s*(AM|PM)?\s*-\s*(\d+):?(\d*)\s*(AM|PM)?/i);
+    if (match) {
+      let startHour = parseInt(match[1]);
+      const startMin = match[2] ? parseInt(match[2]) : 0;
+      const startPeriod = match[3]?.toUpperCase();
+      let endHour = parseInt(match[4]);
+      const endMin = match[5] ? parseInt(match[5]) : 0;
+      const endPeriod = match[6]?.toUpperCase();
+      
+      if (startPeriod === 'PM' && startHour !== 12) startHour += 12;
+      if (startPeriod === 'AM' && startHour === 12) startHour = 0;
+      if (endPeriod === 'PM' && endHour !== 12) endHour += 12;
+      if (endPeriod === 'AM' && endHour === 12) endHour = 0;
+      
+      return {
+        start: `${startHour.toString().padStart(2, '0')}:${startMin.toString().padStart(2, '0')}`,
+        end: `${endHour.toString().padStart(2, '0')}:${endMin.toString().padStart(2, '0')}`
+      };
+    }
+    
+    return { start: '09:00', end: '21:00' };
+  };
+
+  const operatingHoursParsed = parseOperatingHours(operatingHours || '9:00 AM - 9:00 PM');
+
+  // Validate time against operating hours
+  const isTimeWithinOperatingHours = (time) => {
+    return time >= operatingHoursParsed.start && time <= operatingHoursParsed.end;
+  };
+
   // Parse time slot function
   const parseTimeSlot = (slot) => {
     if (slot.includes('Full Day Pass')) {
-      return { startTime: '09:00', endTime: '17:00' };
+      return { startTime: operatingHoursParsed.start, endTime: operatingHoursParsed.end };
     }
     if (slot.includes('Night Owl Pass')) {
       return { startTime: '21:00', endTime: '06:00' };
     }
     
-    // Parse formats like "9am - 1pm", "1pm - 5pm", etc.
     const timeMatch = slot.match(/(\d+)(am|pm)\s*-\s*(\d+)(am|pm)/i);
     if (timeMatch) {
       const startHour = parseInt(timeMatch[1]);
@@ -58,7 +93,6 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
       };
     }
     
-    // Parse session formats
     if (slot.includes('Morning Session')) {
       return { startTime: '10:00', endTime: '14:00' };
     }
@@ -72,10 +106,9 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
       return { startTime: '06:00', endTime: '12:00' };
     }
     
-    return { startTime: '09:00', endTime: '10:00' };
+    return { startTime: operatingHoursParsed.start, endTime: '10:00' };
   };
 
-  // Handle time slot selection
   const handleTimeSlotSelect = (slot) => {
     setSelectedTimeSlot(slot);
     const times = parseTimeSlot(slot);
@@ -85,21 +118,17 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
     clearErrors('endTime');
   };
 
-  // Calculate total price
   const calculateTotal = () => {
     if (watchStartTime && watchEndTime) {
       const start = parseInt(watchStartTime.split(':')[0]);
       const end = parseInt(watchEndTime.split(':')[0]);
       let hours = end - start;
       
-      // Handle overnight bookings
       if (hours < 0) hours += 24;
-      
-      // Ensure minimum 1 hour
       hours = Math.max(hours, 1);
       return hours * price * (watchGuests || 1);
     }
-    return price; // Default to 1 hour, 1 guest
+    return price;
   };
 
   const onSubmit = (data) => {
@@ -117,11 +146,41 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
       return;
     }
 
+    // Validate against operating hours
+    if (!isTimeWithinOperatingHours(data.startTime)) {
+      setError('startTime', {
+        type: 'manual',
+        message: `Start time must be within operating hours (${operatingHours})`
+      });
+      return;
+    }
+
+    if (!isTimeWithinOperatingHours(data.endTime)) {
+      setError('endTime', {
+        type: 'manual',
+        message: `End time must be within operating hours (${operatingHours})`
+      });
+      return;
+    }
+
+    // Check if user already booked the same slot
+    if (hasUserBookedSameSlot(spaceId, data.bookingDate, data.startTime, data.endTime, user.email)) {
+      alert('You have already booked this exact time slot. Please choose a different time.');
+      return;
+    }
+
+    // Check for booking conflicts
+    if (isBookingConflict(spaceId, data.bookingDate, data.startTime, data.endTime, user.email)) {
+      alert('This time slot is already booked. Please choose a different time.');
+      return;
+    }
+
     const booking = {
       spaceId,
       spaceName,
       userId: user.id,
       userName: user.name,
+      userEmail: user.email, // Add email for persistence
       bookingDate: data.bookingDate,
       startTime: data.startTime,
       endTime: data.endTime,
@@ -159,6 +218,12 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
           <h5 className="mb-0"><FaCalendar className="me-2" />Book This Space</h5>
         </div>
         <div className="card-body">
+          {/* Operating Hours Notice */}
+          <div className="alert alert-info mb-3">
+            <FaClock className="me-2" />
+            <strong>Operating Hours:</strong> {operatingHours}
+          </div>
+
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* Quick Time Slots */}
             {timeSlots && timeSlots.length > 0 && (
@@ -208,8 +273,10 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
                   type="time"
                   className={`form-control booking-input ${errors.startTime ? 'is-invalid' : ''}`}
                   {...register('startTime')}
+                  min={operatingHoursParsed.start}
+                  max={operatingHoursParsed.end}
                   onChange={(e) => {
-                    setSelectedTimeSlot(null); // Clear quick selection when manually editing
+                    setSelectedTimeSlot(null);
                     register('startTime').onChange(e);
                   }}
                 />
@@ -225,15 +292,15 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots }) => {
                   type="time"
                   className={`form-control booking-input ${errors.endTime ? 'is-invalid' : ''}`}
                   {...register('endTime')}
+                  min={operatingHoursParsed.start}
+                  max={operatingHoursParsed.end}
                   onChange={(e) => {
-                    setSelectedTimeSlot(null); // Clear quick selection when manually editing
+                    setSelectedTimeSlot(null);
                     register('endTime').onChange(e);
                   }}
                 />
                 {errors.endTime && (
-                  <div className="invalid-feedback">
-                    {errors.endTime.message || (errors.endTime?.type === 'manual' && 'End time must be after start time')}
-                  </div>
+                  <div className="invalid-feedback">{errors.endTime.message}</div>
                 )}
               </div>
             </div>
