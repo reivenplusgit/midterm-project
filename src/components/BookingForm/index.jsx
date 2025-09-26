@@ -14,7 +14,6 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots, operatingHours }) =
   const navigate = useNavigate();
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
 
-  // Check if user already has a booking for this space
   const existingBooking = isAuthenticated ? getUserBookingForSpace(spaceId, user?.email) : null;
 
   const { register, handleSubmit, formState: { errors }, watch, setValue, setError, clearErrors, reset } = useForm({
@@ -26,12 +25,19 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots, operatingHours }) =
     }
   });
 
+  const getTodayDateString = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
   const watchStartTime = watch('startTime');
   const watchEndTime = watch('endTime');
   const watchGuests = watch('guests');
   const watchBookingDate = watch('bookingDate');
 
-  // Parse operating hours
   const parseOperatingHours = (hours) => {
     if (hours === '24/7' || hours === 'Open 24/7') {
       return { start: '00:00', end: '23:59' };
@@ -72,12 +78,11 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots, operatingHours }) =
 
   // Enhanced time slot parsing
   const parseTimeSlot = (slot) => {
-    // Handle Full Day Pass
+
     if (slot.includes('Full Day Pass') || slot.includes('24-hour Pass')) {
       return { startTime: '00:00', endTime: '23:59' };
     }
     
-    // Handle Day Pass
     if (slot.includes('Day Pass')) {
       const match = slot.match(/Day Pass \((\d+):(\d+) (AM|PM) - (\d+):(\d+) (AM|PM)\)/);
       if (match) {
@@ -101,7 +106,6 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots, operatingHours }) =
       return { startTime: '06:00', endTime: '18:00' };
     }
     
-    // Handle Night Pass
     if (slot.includes('Night Pass') || slot.includes('Night Owl Pass')) {
       const match = slot.match(/\((\d+):(\d+) (AM|PM) - (\d+):(\d+) (AM|PM)\)/);
       if (match) {
@@ -199,13 +203,11 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots, operatingHours }) =
       return;
     }
 
-    // Check if user already has a booking for this space
     if (hasUserBookedSpace(spaceId, user.email)) {
       alert('You already have a booking for this space. Please cancel your existing booking from your dashboard to make a new one.');
       return;
     }
 
-    // Validate times
     if (!validateTimes(data.startTime, data.endTime)) {
       setError('endTime', {
         type: 'manual',
@@ -214,7 +216,6 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots, operatingHours }) =
       return;
     }
 
-    // Validate against operating hours (skip for 24/7 spaces)
     if (operatingHours !== '24/7' && operatingHours !== 'Open 24/7') {
       if (!isTimeWithinOperatingHours(data.startTime)) {
         setError('startTime', {
@@ -269,7 +270,6 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots, operatingHours }) =
     );
   }
 
-  // If user already has a booking for this space, show simple notification
   if (existingBooking) {
     return (
       <div className="booking-form-container">
@@ -347,7 +347,7 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots, operatingHours }) =
                 type="date"
                 className={`form-control booking-input ${errors.bookingDate ? 'is-invalid' : ''}`}
                 {...register('bookingDate')}
-                min={new Date().toISOString().split('T')[0]}
+                min={getTodayDateString()}
               />
               {errors.bookingDate && (
                 <div className="invalid-feedback">{errors.bookingDate.message}</div>

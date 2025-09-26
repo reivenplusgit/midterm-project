@@ -5,7 +5,6 @@ import { useBooking } from '../../contexts/BookingContext';
 import ConfirmationModal from '../../components/ConfirmationModal';
 import { FaCalendar, FaClock, FaUsers, FaTimes, FaExclamationTriangle, FaMapMarkerAlt } from 'react-icons/fa';
 import { spacesData } from '../../data/spaces';
-import './Dashboard.css';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -44,7 +43,6 @@ const Dashboard = () => {
     setSelectedBooking(null);
   };
 
-  // Sort bookings by date and time (most recent first)
   const sortedBookings = enrichedBookings.sort((a, b) => {
     const dateA = new Date(`${a.bookingDate} ${a.startTime}`);
     const dateB = new Date(`${b.bookingDate} ${b.startTime}`);
@@ -76,10 +74,40 @@ const Dashboard = () => {
             </div>
             
             {sortedBookings.map(booking => {
-              // Determine if booking is upcoming or past
               const now = new Date();
-              const bookingDateTime = new Date(`${booking.bookingDate} ${booking.startTime}`);
-              const isUpcoming = bookingDateTime >= now;
+              const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+              
+              const bookingDate = new Date(booking.bookingDate + 'T00:00:00'); // Add time to avoid timezone issues
+              const bookingDateTime = new Date(booking.bookingDate + 'T' + booking.startTime + ':00');
+              
+              const isUpcoming = bookingDateTime > now;
+              
+              const getBookingTimeDisplay = () => {
+                // Compare dates only (ignore time for day calculation)
+                const diffTime = bookingDate.getTime() - today.getTime();
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 0) {
+                  // It's today - check if time has passed
+                  const currentTime = now.getHours() * 60 + now.getMinutes();
+                  const [bookingHour, bookingMin] = booking.startTime.split(':').map(Number);
+                  const bookingTimeInMinutes = bookingHour * 60 + bookingMin;
+                  
+                  if (bookingTimeInMinutes > currentTime) {
+                    return 'Today';
+                  } else {
+                    return 'Today (Started)';
+                  }
+                } else if (diffDays === 1) {
+                  return 'Tomorrow';
+                } else if (diffDays > 1) {
+                  return `In ${diffDays} days`;
+                } else {
+                  const pastDays = Math.abs(diffDays);
+                  if (pastDays === 1) return 'Yesterday';
+                  return `${pastDays} days ago`;
+                }
+              };
               
               return (
                 <div key={booking.id} className={`booking-card card mb-4 shadow-sm ${isUpcoming ? 'border-primary' : 'bg-light'}`}>
@@ -125,27 +153,24 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <div className="col-md-2 text-center">
-                        {isUpcoming && (
-                          <div className="mt-2">
-                            <small className="text-muted">
-                              {(() => {
-                                const diffTime = bookingDateTime - now;
-                                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                                if (diffDays === 0) return 'Today';
-                                if (diffDays === 1) return 'Tomorrow';
-                                return `In ${diffDays} days`;
-                              })()}
-                            </small>
-                          </div>
-                        )}
+                        <div className="mt-2">
+                          <small className={`${isUpcoming ? 'text-success' : 'text-muted'}`}>
+                            {getBookingTimeDisplay()}
+                          </small>
+                        </div>
                       </div>
                       <div className="col-md-2 text-end">
-                        <button 
-                          className="btn btn-outline-danger btn-sm"
-                          onClick={() => handleCancelClick(booking)}
-                        >
-                          <FaTimes className="me-1" /> Cancel
-                        </button>
+                        {isUpcoming && (
+                          <button 
+                            className="btn btn-outline-danger btn-sm"
+                            onClick={() => handleCancelClick(booking)}
+                          >
+                            <FaTimes className="me-1" /> Cancel
+                          </button>
+                        )}
+                        {!isUpcoming && (
+                          <span className="badge bg-secondary">Completed</span>
+                        )}
                       </div>
                     </div>
                   </div>

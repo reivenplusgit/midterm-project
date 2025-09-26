@@ -3,7 +3,6 @@ import { useParams, Navigate } from 'react-router-dom';
 import { spacesData } from '../../data/spaces';
 import BookingForm from '../../components/BookingForm';
 import { FaMapMarkerAlt, FaClock, FaMoneyBillWave, FaStar } from 'react-icons/fa';
-import './SpaceDetail.css';
 
 const SpaceDetail = () => {
   const { spaceId } = useParams();
@@ -108,7 +107,7 @@ const SpaceDetail = () => {
                 spaceName={space.name} 
                 price={space.price}
                 timeSlots={space.time_slots}
-                operatingHours={space.hours} // Pass operating hours
+                operatingHours={space.hours}
               />
             </div>
           </div>

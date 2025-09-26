@@ -5,7 +5,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { loginSchema } from '../../utils/validationSchemas';
 import { FaSignInAlt, FaUser, FaEnvelope } from 'react-icons/fa';
-import './Login.css';
 
 const Login = () => {
   const { login } = useAuth();

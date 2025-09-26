@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaMapMarkerAlt, FaClock, FaMoneyBillWave } from 'react-icons/fa';
-import './SpaceCard.css';
 
 const SpaceCard = ({ space }) => {
   const { id, name, location, description, price, main_image, amenities, hours } = space;
@@ -45,7 +44,7 @@ const SpaceCard = ({ space }) => {
             <Link 
               to={`/space/${id}`} 
               className="btn btn-primary w-100"
-              state={{ from: 'homepage' }} // Add state to help with navigation
+              state={{ from: 'homepage' }}
             >
               View Details & Book
             </Link>
