@@ -15,7 +15,7 @@ export const spacesData = [
       "Printing Services"
     ],
     "hours": "9:00 AM - 9:00 PM",
-    "time_slots": ["9am - 1pm", "1pm - 5pm", "5pm - 9pm"]
+    "time_slots": ["9:00 AM - 1:00 PM", "1:00 PM - 5:00 PM", "5:00 PM - 9:00 PM"]
   },
   {
     "id": 2,
@@ -32,8 +32,8 @@ export const spacesData = [
       "24/7 Access",
       "Ergonomic Chairs"
     ],
-    "hours": "Open 24/7",
-    "time_slots": ["Full Day Pass", "Night Owl Pass (9pm-6am)"]
+    "hours": "24/7",
+    "time_slots": ["Full Day Pass", "Night Owl Pass (9:00 PM - 6:00 AM)", "Morning Session (6:00 AM - 12:00 PM)"]
   },
   {
     "id": 3,
@@ -51,7 +51,7 @@ export const spacesData = [
       "Outdoor Garden"
     ],
     "hours": "10:00 AM - 7:00 PM",
-    "time_slots": ["Morning Session (10am-2pm)", "Afternoon Session (2pm-6pm)"]
+    "time_slots": ["Morning Session (10:00 AM - 2:00 PM)", "Afternoon Session (2:00 PM - 7:00 PM)"]
   },
   {
     "id": 4,
@@ -69,7 +69,7 @@ export const spacesData = [
       "High-speed Internet"
     ],
     "hours": "6:00 AM - 12:00 AM",
-    "time_slots": ["Early Bird (6am-12pm)", "Afternoon (12pm-6pm)", "Evening (6pm-12am)"]
+    "time_slots": ["Early Bird (6:00 AM - 12:00 PM)", "Afternoon (12:00 PM - 6:00 PM)", "Evening (6:00 PM - 12:00 AM)"]
   },
   {
     "id": 5,
@@ -87,7 +87,7 @@ export const spacesData = [
       "Quiet Zones"
     ],
     "hours": "8:00 AM - 10:00 PM",
-    "time_slots": ["4-hour slots", "Full Day Access"]
+    "time_slots": ["4-hour Morning (8:00 AM - 12:00 PM)", "4-hour Afternoon (12:00 PM - 4:00 PM)", "Evening (4:00 PM - 10:00 PM)"]
   },
   {
     "id": 6,
@@ -105,7 +105,7 @@ export const spacesData = [
       "Conference Rooms"
     ],
     "hours": "7:00 AM - 11:00 PM",
-    "time_slots": ["2-hour minimum", "Group Packages Available"]
+    "time_slots": ["Morning (7:00 AM - 11:00 AM)", "Afternoon (11:00 AM - 3:00 PM)", "Evening (3:00 PM - 7:00 PM)", "Night (7:00 PM - 11:00 PM)"]
   },
   {
     "id": 7,
@@ -122,8 +122,8 @@ export const spacesData = [
       "Comfortable Loungers",
       "Snack Vending"
     ],
-    "hours": "Open 24/7",
-    "time_slots": ["Day Pass", "Night Pass", "24-hour Pass"]
+    "hours": "24/7",
+    "time_slots": ["Day Pass (6:00 AM - 6:00 PM)", "Night Pass (6:00 PM - 6:00 AM)", "24-hour Pass"]
   },
   {
     "id": 8,
@@ -141,7 +141,7 @@ export const spacesData = [
       "Valet Parking"
     ],
     "hours": "7:00 AM - 10:00 PM",
-    "time_slots": ["Executive Day Pass", "Meeting Room Bookings"]
+    "time_slots": ["Executive Morning (7:00 AM - 12:00 PM)", "Executive Afternoon (12:00 PM - 6:00 PM)", "Executive Evening (6:00 PM - 10:00 PM)"]
   },
   {
     "id": 9,
@@ -159,7 +159,7 @@ export const spacesData = [
       "Student Community"
     ],
     "hours": "6:00 AM - 10:00 PM",
-    "time_slots": ["Per Hour", "Student Day Pass"]
+    "time_slots": ["Early Morning (6:00 AM - 10:00 AM)", "Morning (10:00 AM - 2:00 PM)", "Afternoon (2:00 PM - 6:00 PM)", "Evening (6:00 PM - 10:00 PM)"]
   },
   {
     "id": 10,
@@ -177,6 +177,6 @@ export const spacesData = [
       "Gallery Space"
     ],
     "hours": "9:00 AM - 9:00 PM",
-    "time_slots": ["Creative Session (4 hours)", "Full Day Studio Access"]
+    "time_slots": ["Creative Morning (9:00 AM - 1:00 PM)", "Creative Afternoon (1:00 PM - 5:00 PM)", "Creative Evening (5:00 PM - 9:00 PM)"]
   }
 ];
