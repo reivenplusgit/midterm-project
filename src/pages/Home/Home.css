@@ -1,0 +1,154 @@
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  min-height: 60vh;
+}
+
+.min-vh-75 {
+  min-height: 75vh;
+}
+
+.hero-section h1 {
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.hero-section .lead {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* Stats/Credibility Section */
+.credibility-section {
+  border-top: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.stat-card {
+  padding: 1rem;
+}
+
+.stat-card h2 {
+  margin-bottom: 0.5rem;
+}
+
+/* How It Works Section */
+.benefits-section {
+  background-color: #ffffff;
+}
+
+.feature-icon {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-icon:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Featured Spaces Section */
+.featured-spaces-section {
+  background-color: #f8f9fa;
+}
+
+/* CTA Section */
+.cta-section {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+
+.cta-section .btn-light:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cta-section .btn-outline-light:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Search Section */
+.search-section {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-input {
+  border-radius: 25px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  border: 2px solid #e9ecef;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Button animations */
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 2.5rem;
+  }
+  
+  .display-4 {
+    font-size: 2.5rem;
+  }
+  
+  .display-5 {
+    font-size: 2rem;
+  }
+  
+  .display-6 {
+    font-size: 1.75rem;
+  }
+  
+  .feature-icon {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  
+  .hero-section .d-flex.gap-3 {
+    flex-direction: column;
+    gap: 1rem !important;
+  }
+  
+  .hero-section .btn {
+    width: 100%;
+  }
+}
+
+/* Additional spacing utilities */
+.py-6 {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.my-6 {
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+}
+
+/* Card hover effects for space cards */
+.space-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.space-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}

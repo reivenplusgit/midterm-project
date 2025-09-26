@@ -29,7 +29,7 @@ const SpaceDetail = () => {
                 style={{
                   height: '400px', 
                   objectFit: 'cover',
-                  backgroundColor: '#f8f9fa' // Fallback background
+                  backgroundColor: '#f8f9fa'
                 }}
                 onError={(e) => {
                   e.target.src = `https://via.placeholder.com/800x400/007bff/ffffff?text=${encodeURIComponent(space.name)}`;
@@ -108,6 +108,7 @@ const SpaceDetail = () => {
                 spaceName={space.name} 
                 price={space.price}
                 timeSlots={space.time_slots}
+                operatingHours={space.hours} // Pass operating hours
               />
             </div>
           </div>
