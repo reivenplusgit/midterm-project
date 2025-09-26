@@ -34,7 +34,25 @@ export const BookingProvider = ({ children }) => {
     return bookings.filter(booking => booking.userEmail === userEmail);
   };
 
-  // Check if a booking conflicts with existing bookings
+  // NEW: Check if user already has a booking for this space (active booking only)
+  const hasUserBookedSpace = (spaceId, userEmail) => {
+    return bookings.some(booking => 
+      booking.spaceId === spaceId &&
+      booking.userEmail === userEmail &&
+      booking.status === 'confirmed'
+    );
+  };
+
+  // NEW: Get user's existing booking for a space
+  const getUserBookingForSpace = (spaceId, userEmail) => {
+    return bookings.find(booking => 
+      booking.spaceId === spaceId &&
+      booking.userEmail === userEmail &&
+      booking.status === 'confirmed'
+    );
+  };
+
+  // Check if a booking conflicts with existing bookings (for the same space)
   const isBookingConflict = (spaceId, bookingDate, startTime, endTime, userEmail) => {
     const existingBookings = bookings.filter(booking => 
       booking.spaceId === spaceId && 
@@ -73,7 +91,9 @@ export const BookingProvider = ({ children }) => {
     cancelBooking,
     getUserBookings,
     isBookingConflict,
-    hasUserBookedSameSlot
+    hasUserBookedSameSlot,
+    hasUserBookedSpace,
+    getUserBookingForSpace
   };
 
   return (
