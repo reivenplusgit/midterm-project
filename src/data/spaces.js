@@ -22,8 +22,8 @@ export const spacesData = [
     "name": "WorkHaven Makati",
     "location": "Makati City",
     "price": 500,
-    "main_image": "/space-1.jpg",
-    "images": ["/space-1.jpg"],
+    "main_image": "/space-2.jpg",
+    "images": ["/space-2.jpg"],
     "description": "A professional co-working environment in the heart of the business district. Ideal for meetings, collaborations, and networking.",
     "amenities": [
       "Fiber Internet",
@@ -40,8 +40,8 @@ export const spacesData = [
     "name": "Cebu Creative Hub",
     "location": "Cebu City",
     "price": 250,
-    "main_image": "/space-1.jpg",
-    "images": ["/space-1.jpg"],
+    "main_image": "/space-3.jpg",
+    "images": ["/space-3.jpg"],
     "description": "A vibrant and artistic space designed to foster creativity and collaboration among Cebu's digital nomads and artists.",
     "amenities": [
       "Community Events",
@@ -58,8 +58,8 @@ export const spacesData = [
     "name": "Brainery BGC",
     "location": "Taguig City",
     "price": 450,
-    "main_image": "/space-1.jpg",
-    "images": ["/space-1.jpg"],
+    "main_image": "/space-4.jpg",
+    "images": ["/space-4.jpg"],
     "description": "Premium study space in Bonifacio Global City featuring state-of-the-art facilities and premium amenities for professionals.",
     "amenities": [
       "Dedicated Desks",
@@ -68,16 +68,16 @@ export const spacesData = [
       "Locker Storage",
       "High-speed Internet"
     ],
-    "hours": "6:00 AM - 12:00 AM",
-    "time_slots": ["Early Bird (6:00 AM - 12:00 PM)", "Afternoon (12:00 PM - 6:00 PM)", "Evening (6:00 PM - 12:00 AM)"]
+    "hours": "6:00 AM - 11:59 PM",
+    "time_slots": ["Early Bird (6:00 AM - 12:00 PM)", "Afternoon (12:00 PM - 6:00 PM)", "Evening (6:00 PM - 11:59 PM)"]
   },
   {
     "id": 5,
     "name": "Silent Study Alabang",
     "location": "Muntinlupa City",
     "price": 350,
-    "main_image": "/space-1.jpg",
-    "images": ["/space-1.jpg"],
+    "main_image": "/space-5.jpg",
+    "images": ["/space-5.jpg"],
     "description": "Absolute silence guaranteed. Perfect for deep work and concentration with individual soundproof cubicles.",
     "amenities": [
       "Soundproof Pods",
@@ -94,8 +94,8 @@ export const spacesData = [
     "name": "Group Study HQ",
     "location": "Mandaluyong City",
     "price": 400,
-    "main_image": "/space-1.jpg",
-    "images": ["/space-1.jpg"],
+    "main_image": "/space-6.jpg",
+    "images": ["/space-6.jpg"],
     "description": "Designed for collaborative work with large tables, whiteboards, and presentation equipment for group projects.",
     "amenities": [
       "Large Tables",
@@ -112,8 +112,8 @@ export const spacesData = [
     "name": "Night Owl Study",
     "location": "Manila City",
     "price": 280,
-    "main_image": "/space-1.jpg",
-    "images": ["/space-1.jpg"],
+    "main_image": "/space-7.jpg",
+    "images": ["/space-7.jpg"],
     "description": "24/7 access for night owls and late-night studiers. Safe and secure environment with night staff.",
     "amenities": [
       "24/7 Access",
@@ -130,8 +130,8 @@ export const spacesData = [
     "name": "Executive Study Ortigas",
     "location": "Pasig City",
     "price": 600,
-    "main_image": "/space-1.jpg",
-    "images": ["/space-1.jpg"],
+    "main_image": "/space-8.jpg",
+    "images": ["/space-8.jpg"],
     "description": "Luxury co-working space with executive amenities, perfect for business meetings and professional work.",
     "amenities": [
       "Private Offices",
@@ -148,8 +148,8 @@ export const spacesData = [
     "name": "Student Hub Manila",
     "location": "Manila University Belt",
     "price": 150,
-    "main_image": "/space-1.jpg",
-    "images": ["/space-1.jpg"],
+    "main_image": "/space-9.jpg",
+    "images": ["/space-9.jpg"],
     "description": "Budget-friendly study space designed specifically for students with affordable rates and student discounts.",
     "amenities": [
       "Student Discounts",
@@ -166,8 +166,8 @@ export const spacesData = [
     "name": "Creative Space Paranaque",
     "location": "Paranaque City",
     "price": 320,
-    "main_image": "/space-1.jpg",
-    "images": ["/space-1.jpg"],
+    "main_image": "/space-10.jpg",
+    "images": ["/space-10.jpg"],
     "description": "Inspirational workspace for creatives, featuring art supplies, music rooms, and collaborative spaces.",
     "amenities": [
       "Art Studio",

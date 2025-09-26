@@ -5,15 +5,14 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useBooking } from '../../contexts/BookingContext';
 import { useNavigate } from 'react-router-dom';
 import { bookingSchema, validateTimes } from '../../utils/validationSchemas';
-import { FaCalendar, FaClock, FaUsers, FaCheck, FaBolt, FaExclamationTriangle, FaEdit, FaTimes } from 'react-icons/fa';
+import { FaCalendar, FaClock, FaUsers, FaCheck, FaBolt, FaExclamationTriangle, FaArrowRight } from 'react-icons/fa';
 import './BookingForm.css';
 
 const BookingForm = ({ spaceId, spaceName, price, timeSlots, operatingHours }) => {
   const { user, isAuthenticated } = useAuth();
-  const { addBooking, hasUserBookedSpace, getUserBookingForSpace, cancelBooking } = useBooking();
+  const { addBooking, hasUserBookedSpace, getUserBookingForSpace } = useBooking();
   const navigate = useNavigate();
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   // Check if user already has a booking for this space
   const existingBooking = isAuthenticated ? getUserBookingForSpace(spaceId, user?.email) : null;
@@ -194,14 +193,6 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots, operatingHours }) =
     return price;
   };
 
-  const handleCancelExistingBooking = () => {
-    if (existingBooking) {
-      cancelBooking(existingBooking.id);
-      setShowCancelConfirm(false);
-      alert('Your previous booking has been cancelled. You can now make a new booking.');
-    }
-  };
-
   const onSubmit = (data) => {
     if (!isAuthenticated) {
       navigate('/login');
@@ -210,7 +201,7 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots, operatingHours }) =
 
     // Check if user already has a booking for this space
     if (hasUserBookedSpace(spaceId, user.email)) {
-      alert('You already have a booking for this space. Please cancel your existing booking first to make a new one.');
+      alert('You already have a booking for this space. Please cancel your existing booking from your dashboard to make a new one.');
       return;
     }
 
@@ -278,7 +269,7 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots, operatingHours }) =
     );
   }
 
-  // If user already has a booking for this space, show existing booking info
+  // If user already has a booking for this space, show simple notification
   if (existingBooking) {
     return (
       <div className="booking-form-container">
@@ -294,45 +285,16 @@ const BookingForm = ({ spaceId, spaceName, price, timeSlots, operatingHours }) =
               <p className="mb-1"><strong>Guests:</strong> {existingBooking.guests}</p>
               <p className="mb-0"><strong>Total:</strong> ₱{existingBooking.totalPrice}</p>
             </div>
-            <p className="text-muted small">You can only have one booking per space. Cancel your existing booking to make a new one.</p>
+            <p className="text-muted small">You can only have one booking per space. Manage your bookings from your dashboard.</p>
             
-            {!showCancelConfirm ? (
-              <div className="d-grid gap-2">
-                <button 
-                  className="btn btn-outline-danger"
-                  onClick={() => setShowCancelConfirm(true)}
-                >
-                  <FaTimes className="me-2" /> Cancel This Booking
-                </button>
-                <button 
-                  className="btn btn-secondary"
-                  onClick={() => navigate('/dashboard/my-bookings')}
-                >
-                  View All My Bookings
-                </button>
-              </div>
-            ) : (
-              <div className="cancel-confirm bg-light p-3 rounded">
-                <p className="text-danger mb-3">
-                  <FaExclamationTriangle className="me-2" />
-                  Are you sure you want to cancel this booking?
-                </p>
-                <div className="d-flex gap-2">
-                  <button 
-                    className="btn btn-danger btn-sm"
-                    onClick={handleCancelExistingBooking}
-                  >
-                    Yes, Cancel Booking
-                  </button>
-                  <button 
-                    className="btn btn-secondary btn-sm"
-                    onClick={() => setShowCancelConfirm(false)}
-                  >
-                    Keep Booking
-                  </button>
-                </div>
-              </div>
-            )}
+            <div className="d-grid gap-2">
+              <button 
+                className="btn btn-primary"
+                onClick={() => navigate('/dashboard/my-bookings')}
+              >
+                <FaArrowRight className="me-2" /> Go to Dashboard
+              </button>
+            </div>
           </div>
         </div>
       </div>
