@@ -63,7 +63,7 @@ const Home = () => {
             </div>
             <div className="col-lg-6">
               <img 
-                src="/space-1.jpg" 
+                src="/space-0.jpg" 
                 alt="Study Space" 
                 className="img-fluid rounded shadow-lg"
               />
@@ -262,7 +262,7 @@ const Home = () => {
                 )}
               </div>
               <div className="mt-4">
-                <small>No signup fees • Instant booking • Cancel anytime</small>
+                <small>No signup fees • Instant booking • Cancel anytime • Credits to the owners for the information and photos used</small>
               </div>
             </div>
           </div>
